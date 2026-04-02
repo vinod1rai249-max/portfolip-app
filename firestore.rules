@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+         (request.auth.token.email == "vinod1rai249@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    // User Profiles: Publicly readable, only owner/admin can write
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isOwner(userId) || isAdmin();
+
+      match /experience/{expId} {
+        allow read: if true;
+        allow write: if isOwner(userId) || isAdmin();
+      }
+      match /achievements/{achId} {
+        allow read: if true;
+        allow write: if isOwner(userId) || isAdmin();
+      }
+      match /learning/{learnId} {
+        allow read: if true;
+        allow write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Messages: Anyone can create, only admin can read/delete
+    match /messages/{msgId} {
+      allow create: if true;
+      allow read, delete: if isAdmin();
+    }
+  }
+}

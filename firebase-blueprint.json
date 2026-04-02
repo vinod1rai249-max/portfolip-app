@@ -1,0 +1,101 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Information about the portfolio owner.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "bio": { "type": "string" },
+        "profileImage": { "type": "string" },
+        "socialLinks": {
+          "type": "object",
+          "properties": {
+            "github": { "type": "string" },
+            "linkedin": { "type": "string" },
+            "twitter": { "type": "string" }
+          }
+        }
+      },
+      "required": ["name", "role", "bio"]
+    },
+    "Experience": {
+      "title": "Work Experience",
+      "description": "Professional work history.",
+      "type": "object",
+      "properties": {
+        "company": { "type": "string" },
+        "role": { "type": "string" },
+        "duration": { "type": "string" },
+        "achievements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "order": { "type": "integer" }
+      },
+      "required": ["company", "role", "duration"]
+    },
+    "Achievement": {
+      "title": "Achievement or Certification",
+      "description": "Certifications, awards, or hackathon rankings.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "issuer": { "type": "string" },
+        "date": { "type": "string" },
+        "link": { "type": "string" },
+        "icon": { "type": "string" },
+        "description": { "type": "string" },
+        "certificateUrl": { "type": "string" }
+      },
+      "required": ["title", "issuer"]
+    },
+    "LearningProgress": {
+      "title": "Learning Progress",
+      "description": "Ongoing learning journey tracker.",
+      "type": "object",
+      "properties": {
+        "subject": { "type": "string" },
+        "progress": { "type": "integer" },
+        "status": { "type": "string", "enum": ["learning", "completed", "planned"] },
+        "icon": { "type": "string" }
+      },
+      "required": ["subject", "progress", "status"]
+    },
+    "Message": {
+      "title": "Contact Message",
+      "description": "Messages from visitors.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile data."
+    },
+    "/users/{userId}/experience/{expId}": {
+      "schema": "Experience",
+      "description": "Work experience entries."
+    },
+    "/users/{userId}/achievements/{achId}": {
+      "schema": "Achievement",
+      "description": "Certifications and awards."
+    },
+    "/users/{userId}/learning/{learnId}": {
+      "schema": "LearningProgress",
+      "description": "Learning journey entries."
+    },
+    "/messages/{msgId}": {
+      "schema": "Message",
+      "description": "Contact form messages."
+    }
+  }
+}
