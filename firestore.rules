@@ -38,5 +38,10 @@ service cloud.firestore {
       allow create: if true;
       allow read, delete: if isAdmin();
     }
+
+    // Portfolio Stats (Reactions, Views): Anyone can read and update
+    match /portfolio_stats/{statId} {
+      allow read, write: if true;
+    }
   }
 }

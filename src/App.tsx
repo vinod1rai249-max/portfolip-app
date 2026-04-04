@@ -6,11 +6,11 @@ import {
   MessageSquare, Send, User, ChevronRight,
   Terminal, Zap, Star, Filter, Download,
   BarChart3, BrainCircuit, Rocket, GraduationCap,
-  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon
+  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2
 } from 'lucide-react';
 import { 
   collection, query, orderBy, onSnapshot, addDoc, serverTimestamp,
-  doc, updateDoc, getDoc, setDoc
+  doc, updateDoc, getDoc, setDoc, deleteDoc
 } from 'firebase/firestore';
 import { db, auth, storage } from './lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -23,9 +23,11 @@ import {
 } from 'recharts';
 import ReactMarkdown from 'react-markdown';
 import { GitHubCalendar } from 'react-github-calendar';
+import Tilt from 'react-parallax-tilt';
 import axios from 'axios';
 import { toast, Toaster } from 'sonner';
 import { cn } from './lib/utils';
+import { increment } from 'firebase/firestore';
 import { 
   UserProfile, Experience, Achievement, 
   LearningProgress, GithubRepo, ChatMessage 
@@ -406,9 +408,9 @@ const Hero = ({
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <button className="px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-all">
+            <a href="#projects" className="px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-all">
               View Projects <ChevronRight size={20} />
-            </button>
+            </a>
             <button 
               onClick={() => {
                 const chatBtn = document.querySelector('button[class*="w-14 h-14"]') as HTMLButtonElement;
@@ -594,7 +596,7 @@ const ProjectsSection = () => {
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        const response = await fetch('https://api.github.com/users/vinod1rai249-max/repos?sort=updated&per_page=6');
+        const response = await fetch('https://api.github.com/users/vinod1rai249-max/repos?sort=updated&per_page=100');
         if (response.ok) {
           const data = await response.json();
           if (data.length > 0) {
@@ -664,41 +666,42 @@ const ProjectsSection = () => {
           ))
         ) : (
           filteredRepos.map((repo) => (
-            <motion.div 
-              key={repo.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="glass-card flex flex-col group"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <Terminal className="text-blue-500" size={20} />
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 text-xs text-gray-400">
-                    <Star size={12} className="text-yellow-500" /> {repo.stargazers_count}
+            <Tilt key={repo.id} tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.02} transitionSpeed={2000} className="h-full">
+              <motion.div 
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="glass-card flex flex-col group h-full hover:border-blue-500/30 transition-colors"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <Terminal className="text-blue-500" size={20} />
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <Star size={12} className="text-yellow-500" /> {repo.stargazers_count}
+                    </div>
+                    <a href={repo.html_url} target="_blank" className="text-gray-400 hover:text-white transition-colors">
+                      <ExternalLink size={18} />
+                    </a>
                   </div>
-                  <a href={repo.html_url} target="_blank" className="text-gray-400 hover:text-white transition-colors">
-                    <ExternalLink size={18} />
-                  </a>
                 </div>
-              </div>
-              <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{repo.name}</h3>
-              <p className="text-sm text-gray-400 mb-6 line-clamp-3 flex-grow">
-                {repo.description || "No description provided for this repository."}
-              </p>
-              <div className="flex flex-wrap gap-2 mt-auto">
-                {repo.language && (
-                  <span className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-blue-400 border border-white/10">
-                    {repo.language}
-                  </span>
-                )}
-                {repo.topics?.slice(0, 3).map(topic => (
-                  <span key={topic} className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-gray-400 border border-white/10">
-                    #{topic}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
+                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{repo.name}</h3>
+                <p className="text-sm text-gray-400 mb-6 line-clamp-3 flex-grow">
+                  {repo.description || "No description provided for this repository."}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-auto">
+                  {repo.language && (
+                    <span className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-blue-400 border border-white/10">
+                      {repo.language}
+                    </span>
+                  )}
+                  {repo.topics?.slice(0, 3).map(topic => (
+                    <span key={topic} className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-gray-400 border border-white/10">
+                      #{topic}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </Tilt>
           ))
         )}
       </div>
@@ -785,8 +788,21 @@ const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
         {/* GitHub Activity */}
         <div className="glass-card lg:col-span-2 flex flex-col">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <Github size={18} className="text-blue-500" /> Recent GitHub Activity
+            <Github size={18} className="text-blue-500" /> GitHub Activity
           </h3>
+          
+          <div className="mb-6 overflow-x-auto pb-4">
+            <GitHubCalendar 
+              username="vinod1rai249-max" 
+              colorScheme="dark"
+              theme={{
+                light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+                dark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+              }}
+            />
+          </div>
+
+          <h4 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">Recent Events</h4>
           <div className="w-full flex-grow overflow-y-auto pr-2 custom-scrollbar" style={{ maxHeight: '256px' }}>
             {loadingActivity ? (
               <div className="flex items-center justify-center h-full">
@@ -973,6 +989,19 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
     }
   };
 
+  const handleDeleteAchievement = async (e: React.MouseEvent, achId: string) => {
+    e.stopPropagation();
+    
+    try {
+      const path = `users/vinod-rai-profile/achievements/${achId}`;
+      await deleteDoc(doc(db, 'users', 'vinod-rai-profile', 'achievements', achId));
+      toast.success('Achievement deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting achievement:', error);
+      toast.error('Failed to delete achievement');
+    }
+  };
+
   return (
     <section id="achievements" className="py-24 max-w-7xl mx-auto px-6">
       <div className="flex items-center gap-4 mb-16">
@@ -987,22 +1016,32 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {achievements.map((ach) => (
-          <motion.div 
-            key={ach.id}
-            whileHover={{ y: -5 }}
-            onClick={() => setSelectedAch(ach)}
-            className="glass-card flex flex-col items-center text-center group cursor-pointer"
-          >
-            <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
-              <span className="text-3xl">{ach.icon}</span>
-            </div>
-            <h3 className="font-bold mb-2">{ach.title}</h3>
-            <p className="text-sm text-gray-500 mb-4">{ach.issuer}</p>
-            <div className="text-xs font-mono text-blue-400 mb-6">{ach.date}</div>
-            <div className="mt-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-blue-400 transition-colors">
-              View Certificate <ExternalLink size={12} />
-            </div>
-          </motion.div>
+          <Tilt key={ach.id} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
+            <motion.div 
+              whileHover={{ y: -5 }}
+              onClick={() => setSelectedAch(ach)}
+              className="glass-card flex flex-col items-center text-center group cursor-pointer relative h-full hover:border-blue-500/50 transition-all overflow-hidden"
+            >
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDeleteAchievement(e, ach.id)}
+                  className="absolute top-3 right-3 p-2 bg-red-500/20 text-red-500 rounded-full transition-all hover:bg-red-500 hover:text-white z-20 shadow-lg"
+                  title="Delete Achievement"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
+                <span className="text-3xl">{ach.icon}</span>
+              </div>
+              <h3 className="font-bold mb-2">{ach.title}</h3>
+              <p className="text-sm text-gray-500 mb-4">{ach.issuer}</p>
+              <div className="text-xs font-mono text-blue-400 mb-6">{ach.date}</div>
+              <div className="mt-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-blue-400 transition-colors">
+                View Certificate <ExternalLink size={12} />
+              </div>
+            </motion.div>
+          </Tilt>
         ))}
 
         {isAdmin && (
@@ -1231,11 +1270,16 @@ const AIChat = ({ profile, theme }: { profile: UserProfile, theme: 'dark' | 'lig
     }
   }, [messages]);
 
+  const handleSendRef = useRef<(overrideInput?: string) => Promise<void>>(() => Promise.resolve());
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  });
+
   useEffect(() => {
     const handleAIAction = (e: any) => {
       setIsOpen(true);
       if (e.detail === 'summarize-resume') {
-        handleSend("Can you give me a quick summary of your resume and key strengths?");
+        handleSendRef.current("Can you give me a quick summary of your resume and key strengths?");
       }
     };
     window.addEventListener('ai-action', handleAIAction);
@@ -1254,15 +1298,15 @@ const AIChat = ({ profile, theme }: { profile: UserProfile, theme: 'dark' | 'lig
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: [
-          { role: 'user', parts: [{ text: `You are an AI assistant for ${profile.name}'s portfolio. 
+        contents: userMsg,
+        config: {
+          systemInstruction: `You are an AI assistant for ${profile.name}'s portfolio. 
           Bio: ${profile.bio}. Role: ${profile.role}. 
           Answer questions about them professionally and enthusiastically. 
           Keep responses concise and formatted in markdown.
           If asked about projects, mention they are synced from GitHub and suggest relevant ones based on their query.
-          If asked for a resume summary, provide a high-impact 3-bullet summary focusing on AI, Python, and Cloud skills.
-          User Question: ${userMsg}` }] }
-        ]
+          If asked for a resume summary, provide a high-impact 3-bullet summary focusing on AI, Python, and Cloud skills.`
+        }
       });
       
       setMessages(prev => [...prev, { role: 'model', text: response.text || 'I am sorry, I could not process that.' }]);
@@ -1488,6 +1532,163 @@ const Contact = () => {
 };
 
 // --- Main App ---
+
+const CustomCursor = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const updateMousePosition = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    const handleMouseOver = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).tagName.toLowerCase() === 'button' || 
+          (e.target as HTMLElement).tagName.toLowerCase() === 'a' ||
+          (e.target as HTMLElement).closest('button') ||
+          (e.target as HTMLElement).closest('a')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+    window.addEventListener('mousemove', updateMousePosition);
+    window.addEventListener('mouseover', handleMouseOver);
+    return () => {
+      window.removeEventListener('mousemove', updateMousePosition);
+      window.removeEventListener('mouseover', handleMouseOver);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-6 h-6 rounded-full border-2 border-blue-500 pointer-events-none z-[9999] mix-blend-difference flex items-center justify-center hidden md:flex"
+      animate={{
+        x: mousePosition.x - 12,
+        y: mousePosition.y - 12,
+        scale: isHovering ? 1.5 : 1,
+        backgroundColor: isHovering ? 'rgba(59, 130, 246, 0.5)' : 'transparent'
+      }}
+      transition={{ type: 'spring', stiffness: 500, damping: 28, mass: 0.5 }}
+    >
+      <div className="w-1 h-1 bg-blue-500 rounded-full" />
+    </motion.div>
+  );
+};
+
+const ReactionsWidget = () => {
+  const [reactions, setReactions] = useState({ heart: 0, rocket: 0, bulb: 0 });
+  
+  useEffect(() => {
+    const docRef = doc(db, 'portfolio_stats', 'reactions');
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setReactions(docSnap.data() as any);
+      } else {
+        setDoc(docRef, { heart: 0, rocket: 0, bulb: 0 }).catch(console.error);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleReact = async (type: string) => {
+    const docRef = doc(db, 'portfolio_stats', 'reactions');
+    try {
+      await updateDoc(docRef, {
+        [type]: increment(1)
+      });
+    } catch (err: any) {
+      if (err.code === 'not-found') {
+        await setDoc(docRef, { heart: 0, rocket: 0, bulb: 0, [type]: 1 }).catch(console.error);
+      }
+    }
+  };
+
+  return (
+    <div className="fixed left-6 bottom-6 z-40 flex flex-col gap-2">
+      <button onClick={() => handleReact('heart')} className="glass-card p-2 rounded-full hover:scale-110 transition-transform flex items-center gap-2 text-sm border-white/10 hover:border-pink-500/50">
+        ❤️ <span>{reactions.heart}</span>
+      </button>
+      <button onClick={() => handleReact('rocket')} className="glass-card p-2 rounded-full hover:scale-110 transition-transform flex items-center gap-2 text-sm border-white/10 hover:border-blue-500/50">
+        🚀 <span>{reactions.rocket}</span>
+      </button>
+      <button onClick={() => handleReact('bulb')} className="glass-card p-2 rounded-full hover:scale-110 transition-transform flex items-center gap-2 text-sm border-white/10 hover:border-yellow-500/50">
+        💡 <span>{reactions.bulb}</span>
+      </button>
+    </div>
+  );
+};
+
+const SpotifyWidget = () => {
+  const [song, setSong] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchSpotify = async () => {
+      const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+      const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
+      const refreshToken = import.meta.env.VITE_SPOTIFY_REFRESH_TOKEN;
+
+      if (!clientId || !clientSecret || !refreshToken) return;
+
+      try {
+        const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
+          },
+          body: new URLSearchParams({
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken
+          })
+        });
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.access_token) {
+          const songResponse = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
+          });
+          if (songResponse.status === 200) {
+            const songData = await songResponse.json();
+            setSong(songData);
+          } else {
+            setSong(null);
+          }
+        }
+      } catch (err) {
+        console.error("Spotify fetch error", err);
+      }
+    };
+    
+    fetchSpotify();
+    const interval = setInterval(fetchSpotify, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!song || !song.item) {
+    return (
+      <div className="fixed left-6 top-24 z-40 glass-card p-3 rounded-xl flex items-center gap-3 text-xs opacity-50 hidden md:flex">
+        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+        </div>
+        <span>Spotify not configured</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed left-6 top-24 z-40 glass-card p-3 rounded-xl flex items-center gap-3 max-w-[200px] hidden md:flex">
+      <img src={song.item.album.images[0].url} alt="Album Art" className="w-10 h-10 rounded-md animate-[spin_10s_linear_infinite]" />
+      <div className="overflow-hidden">
+        <div className="text-[10px] text-green-400 font-bold flex items-center gap-1 uppercase tracking-wider">
+          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+          Currently Playing
+        </div>
+        <div className="text-xs font-bold truncate">{song.item.name}</div>
+        <div className="text-[10px] text-gray-400 truncate">{song.item.artists.map((a:any)=>a.name).join(', ')}</div>
+      </div>
+    </div>
+  );
+};
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -1760,6 +1961,16 @@ export default function App() {
         id: doc.id,
         ...doc.data()
       })) as Achievement[];
+      
+      // Auto-delete duplicate "PrintAchievemen - Vinod Rai_compressed"
+      const duplicates = firestoreAchievements.filter(a => a.title === 'PrintAchievemen - Vinod Rai_compressed');
+      if (duplicates.length > 1) {
+        // Delete the first one (oldest or newest depending on sort, let's just delete the first one in the array)
+        deleteDoc(doc(db, 'users', 'vinod-rai-profile', 'achievements', duplicates[0].id))
+          .then(() => console.log('Deleted duplicate achievement'))
+          .catch(e => console.error('Error deleting duplicate', e));
+      }
+
       setAchievements(firestoreAchievements);
     }, (error) => {
       console.error("Error fetching achievements:", error);
@@ -1770,7 +1981,22 @@ export default function App() {
   if (!profile) return <div className="min-h-screen bg-black flex items-center justify-center"><Zap className="text-blue-500 animate-pulse" size={48} /></div>;
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
+      <CustomCursor />
+      <ReactionsWidget />
+      <SpotifyWidget />
+      {/* Professional Photo Background */}
+      <div className="fixed inset-0 z-[-1] bg-[var(--theme-bg)]">
+        <img 
+          src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop" 
+          alt="Professional Background" 
+          className="absolute inset-0 w-full h-full object-cover opacity-10 dark:opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--theme-bg)]/80 via-[var(--theme-bg)]/90 to-[var(--theme-bg)]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[128px]" />
+      </div>
+
       <Toaster position="top-right" theme={theme} richColors />
       <Navbar theme={theme} toggleTheme={toggleTheme} />
       <Hero 
