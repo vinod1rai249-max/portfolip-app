@@ -375,7 +375,7 @@ const Hero = ({
           
           <div className="flex items-center gap-6 mb-10">
             <a 
-              href={profile.socialLinks.linkedin} 
+              href="https://www.linkedin.com/in/vinod-rai-23b706392/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-all group"
@@ -386,7 +386,7 @@ const Hero = ({
               <span className="text-sm font-medium">LinkedIn</span>
             </a>
             <a 
-              href={profile.socialLinks.github} 
+              href="https://github.com/vinod1rai249-max" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-all group"
