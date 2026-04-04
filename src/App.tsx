@@ -306,8 +306,7 @@ const Hero = ({
   uploading, 
   handleImageUpload,
   handleResumeUpload,
-  handleResumeView,
-  handleResumeDownload
+  handleResumeView
 }: { 
   profile: UserProfile;
   isAdmin: boolean;
@@ -315,7 +314,6 @@ const Hero = ({
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleResumeUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleResumeView: () => Promise<void>;
-  handleResumeDownload: () => Promise<void>;
 }) => {
   const [text, setText] = useState('');
   const roles = ["AI Enthusiast", "Python Developer", "Cloud Learner", "Problem Solver"];
@@ -434,12 +432,6 @@ const Hero = ({
                 >
                   <Eye size={16} /> View Resume
                 </button>
-                <button 
-                  onClick={handleResumeDownload}
-                  className="px-6 py-3 glass rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all border border-white/10 text-sm"
-                >
-                  <Download size={16} /> Download Resume
-                </button>
               </>
             ) : (
               <div className="text-gray-400 text-sm italic flex items-center gap-2">
@@ -543,6 +535,11 @@ const Hero = ({
 };
 
 const ExperienceSection = ({ experiences }: { experiences: Experience[] }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const sortedExperiences = [...experiences].sort((a, b) => a.order - b.order);
+
+  if (!sortedExperiences.length) return null;
+
   return (
     <section id="experience" className="py-24 max-w-7xl mx-auto px-6">
       <div className="flex items-center gap-4 mb-16">
@@ -555,34 +552,69 @@ const ExperienceSection = ({ experiences }: { experiences: Experience[] }) => {
         </div>
       </div>
 
-      <div className="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
-        {experiences.sort((a, b) => a.order - b.order).map((exp, i) => (
-          <motion.div 
-            key={exp.id}
-            initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
-          >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white/20 bg-black text-blue-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-              <Zap size={16} />
-            </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] glass-card">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-xl">{exp.role}</h3>
-                <time className="text-xs font-mono text-blue-500 bg-blue-500/10 px-2 py-1 rounded">{exp.duration}</time>
+      <div className="flex flex-col md:flex-row gap-8 md:gap-12 min-h-[400px]">
+        {/* Left/Top: Tabs */}
+        <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible hide-scrollbar border-b md:border-b-0 md:border-l border-white/10 md:w-1/4 shrink-0 relative">
+          {sortedExperiences.map((exp, index) => (
+            <button
+              key={exp.id}
+              onClick={() => setActiveIndex(index)}
+              className={cn(
+                "px-6 py-4 text-left font-medium text-sm whitespace-nowrap transition-all duration-300 relative",
+                activeIndex === index ? "text-blue-400 bg-blue-500/5" : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+              )}
+            >
+              {exp.company}
+              {/* Active Indicator */}
+              {activeIndex === index && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 md:h-full md:w-0.5 md:right-auto md:bottom-auto bg-blue-500"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right/Bottom: Content */}
+        <div className="md:w-3/4 relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="glass-card h-full"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                <h3 className="font-bold text-2xl">
+                  {sortedExperiences[activeIndex].role} <span className="text-blue-500">@ {sortedExperiences[activeIndex].company}</span>
+                </h3>
+                <time className="text-sm font-mono text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-lg whitespace-nowrap">
+                  {sortedExperiences[activeIndex].duration}
+                </time>
               </div>
-              <div className="text-blue-400 font-medium mb-4">{exp.company}</div>
-              <ul className="space-y-2">
-                {exp.achievements.map((ach, idx) => (
-                  <li key={idx} className="text-sm text-gray-400 flex gap-2">
-                    <span className="text-blue-500 mt-1">•</span> {ach}
-                  </li>
+              
+              <ul className="space-y-4 mt-8">
+                {sortedExperiences[activeIndex].achievements.map((ach, idx) => (
+                  <motion.li 
+                    key={idx} 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="text-gray-300 flex gap-4 leading-relaxed"
+                  >
+                    <span className="text-blue-500 mt-1.5 shrink-0"><ChevronRight size={16} /></span> 
+                    <span>{ach}</span>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );
@@ -884,6 +916,26 @@ const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
   );
 };
 
+const getCertLogo = (title: string, issuer: string) => {
+  const text = `${title} ${issuer}`.toLowerCase();
+  if (text.includes('mulesoft')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/MuleSoft_Logo.svg/512px-MuleSoft_Logo.svg.png';
+  if (text.includes('pega')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Pegasystems_logo.svg/512px-Pegasystems_logo.svg.png';
+  if (text.includes('aws') || text.includes('amazon')) return 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg';
+  if (text.includes('google') || text.includes('gcp')) return 'https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg';
+  if (text.includes('microsoft') || text.includes('azure')) return 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg';
+  if (text.includes('salesforce')) return 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg';
+  if (text.includes('oracle')) return 'https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg';
+  if (text.includes('cisco')) return 'https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg';
+  if (text.includes('ibm')) return 'https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg';
+  if (text.includes('kubernetes') || text.includes('cka')) return 'https://upload.wikimedia.org/wikipedia/commons/3/39/Kubernetes_logo_without_workmark.svg';
+  if (text.includes('docker')) return 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg';
+  if (text.includes('python')) return 'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg';
+  if (text.includes('react')) return 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg';
+  
+  // Fallback generic badge
+  return 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
+};
+
 const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievement[], isAdmin: boolean }) => {
   const [selectedAch, setSelectedAch] = useState<Achievement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -1031,8 +1083,15 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                   <Trash2 size={16} />
                 </button>
               )}
-              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
-                <span className="text-3xl">{ach.icon}</span>
+              <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 overflow-hidden p-3 border border-white/10 group-hover:border-blue-500/50 group-hover:bg-white/10 transition-all duration-500">
+                <img 
+                  src={getCertLogo(ach.title, ach.issuer)} 
+                  alt={ach.title} 
+                  className="w-full h-full object-contain drop-shadow-md"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
+                  }}
+                />
               </div>
               <h3 className="font-bold mb-2">{ach.title}</h3>
               <p className="text-sm text-gray-500 mb-4">{ach.issuer}</p>
@@ -1618,77 +1677,6 @@ const ReactionsWidget = () => {
   );
 };
 
-const SpotifyWidget = () => {
-  const [song, setSong] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchSpotify = async () => {
-      const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-      const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
-      const refreshToken = import.meta.env.VITE_SPOTIFY_REFRESH_TOKEN;
-
-      if (!clientId || !clientSecret || !refreshToken) return;
-
-      try {
-        const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': 'Basic ' + btoa(`${clientId}:${clientSecret}`)
-          },
-          body: new URLSearchParams({
-            grant_type: 'refresh_token',
-            refresh_token: refreshToken
-          })
-        });
-        const tokenData = await tokenResponse.json();
-        
-        if (tokenData.access_token) {
-          const songResponse = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-            headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
-          });
-          if (songResponse.status === 200) {
-            const songData = await songResponse.json();
-            setSong(songData);
-          } else {
-            setSong(null);
-          }
-        }
-      } catch (err) {
-        console.error("Spotify fetch error", err);
-      }
-    };
-    
-    fetchSpotify();
-    const interval = setInterval(fetchSpotify, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!song || !song.item) {
-    return (
-      <div className="fixed left-6 top-24 z-40 glass-card p-3 rounded-xl flex items-center gap-3 text-xs opacity-50 hidden md:flex">
-        <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-        </div>
-        <span>Spotify not configured</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed left-6 top-24 z-40 glass-card p-3 rounded-xl flex items-center gap-3 max-w-[200px] hidden md:flex">
-      <img src={song.item.album.images[0].url} alt="Album Art" className="w-10 h-10 rounded-md animate-[spin_10s_linear_infinite]" />
-      <div className="overflow-hidden">
-        <div className="text-[10px] text-green-400 font-bold flex items-center gap-1 uppercase tracking-wider">
-          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-          Currently Playing
-        </div>
-        <div className="text-xs font-bold truncate">{song.item.name}</div>
-        <div className="text-[10px] text-gray-400 truncate">{song.item.artists.map((a:any)=>a.name).join(', ')}</div>
-      </div>
-    </div>
-  );
-};
 
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -1872,30 +1860,6 @@ export default function App() {
     }
   };
 
-  const handleResumeDownload = async () => {
-    if (!profile?.resumeUrl) return;
-
-    try {
-      // Increment download count in Firestore
-      const profileDoc = doc(db, 'users', 'vinod-rai-profile');
-      const newDownloads = (profile.resumeDownloads || 0) + 1;
-      await setDoc(profileDoc, { resumeDownloads: newDownloads }, { merge: true });
-
-      // Update local state
-      setProfile(prev => prev ? { ...prev, resumeDownloads: newDownloads } : null);
-
-      // Trigger download
-      const link = document.createElement('a');
-      link.href = profile.resumeUrl;
-      link.download = profile.resumeFileName || 'Vinod_Rai_Resume.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error downloading resume:", error);
-    }
-  };
-
   useEffect(() => {
     setExperiences([
       {
@@ -1963,7 +1927,7 @@ export default function App() {
       })) as Achievement[];
       
       // Auto-delete duplicate "PrintAchievemen - Vinod Rai_compressed"
-      const duplicates = firestoreAchievements.filter(a => a.title === 'PrintAchievemen - Vinod Rai_compressed');
+      const duplicates = firestoreAchievements.filter(a => a.title.includes('PrintAchievemen'));
       if (duplicates.length > 1) {
         // Delete the first one (oldest or newest depending on sort, let's just delete the first one in the array)
         deleteDoc(doc(db, 'users', 'vinod-rai-profile', 'achievements', duplicates[0].id))
@@ -1971,7 +1935,16 @@ export default function App() {
           .catch(e => console.error('Error deleting duplicate', e));
       }
 
-      setAchievements(firestoreAchievements);
+      // Clean up the title text without removing the certification itself
+      const processedAchievements = firestoreAchievements.map(a => ({
+        ...a,
+        title: a.title
+          .replace(/PrintAchievemen?t?\s*-\s*Vinod Rai_compressed/gi, '')
+          .replace(/PrintAchievemen?t?/gi, '') // Just in case it's only this word
+          .replace(/^-\s*/, '') // Remove leading hyphens if any are left
+          .trim() || 'Certification' // Fallback if the title becomes completely empty
+      }));
+      setAchievements(processedAchievements);
     }, (error) => {
       console.error("Error fetching achievements:", error);
     });
@@ -1984,7 +1957,6 @@ export default function App() {
     <div className="relative min-h-screen">
       <CustomCursor />
       <ReactionsWidget />
-      <SpotifyWidget />
       {/* Professional Photo Background */}
       <div className="fixed inset-0 z-[-1] bg-[var(--theme-bg)]">
         <img 
@@ -2006,7 +1978,6 @@ export default function App() {
         handleImageUpload={handleImageUpload}
         handleResumeUpload={handleResumeUpload}
         handleResumeView={handleResumeView}
-        handleResumeDownload={handleResumeDownload}
       />
       <ExperienceSection experiences={experiences} />
       <ProjectsSection />
