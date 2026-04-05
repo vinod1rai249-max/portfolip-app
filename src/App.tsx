@@ -32,6 +32,8 @@ import {
   UserProfile, Experience, Achievement, 
   LearningProgress, GithubRepo, ChatMessage 
 } from './types';
+import { Hero3D } from './components/Hero3D';
+import { SkillSphere } from './components/SkillSphere';
 
 enum OperationType {
   CREATE = 'create',
@@ -348,6 +350,7 @@ const Hero = ({
 
   return (
     <section id="about" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      <Hero3D />
       <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px]" />
@@ -579,7 +582,7 @@ const ExperienceSection = ({ experiences }: { experiences: Experience[] }) => {
         </div>
 
         {/* Right/Bottom: Content */}
-        <div className="md:w-3/4 relative">
+        <div className="md:w-3/4 relative perspective-1000">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
@@ -587,31 +590,49 @@ const ExperienceSection = ({ experiences }: { experiences: Experience[] }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="glass-card h-full"
+              className="relative w-full h-full min-h-[400px] group"
+              style={{ perspective: '1000px' }}
             >
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-                <h3 className="font-bold text-2xl">
-                  {sortedExperiences[activeIndex].role} <span className="text-blue-500">@ {sortedExperiences[activeIndex].company}</span>
-                </h3>
-                <time className="text-sm font-mono text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-lg whitespace-nowrap">
-                  {sortedExperiences[activeIndex].duration}
-                </time>
+              <div className="w-full h-full relative transition-transform duration-700 preserve-3d group-hover:rotate-y-180">
+                
+                {/* Front of Card */}
+                <div className="absolute inset-0 w-full h-full glass-card backface-hidden flex flex-col items-center justify-center text-center p-8">
+                  <div className="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 mb-6 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                    <Briefcase size={40} />
+                  </div>
+                  <h3 className="font-bold text-3xl mb-2">
+                    {sortedExperiences[activeIndex].role}
+                  </h3>
+                  <h4 className="text-xl text-blue-400 mb-6">
+                    @ {sortedExperiences[activeIndex].company}
+                  </h4>
+                  <time className="text-sm font-mono text-gray-400 bg-white/5 px-4 py-2 rounded-lg">
+                    {sortedExperiences[activeIndex].duration}
+                  </time>
+                  <p className="mt-8 text-gray-500 text-sm flex items-center gap-2 animate-pulse">
+                    Hover to reveal details <ChevronRight size={16} />
+                  </p>
+                </div>
+
+                {/* Back of Card */}
+                <div className="absolute inset-0 w-full h-full glass-card backface-hidden rotate-y-180 overflow-y-auto p-8">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-white/10 pb-4">
+                    <h3 className="font-bold text-xl">
+                      {sortedExperiences[activeIndex].role} <span className="text-blue-500">@ {sortedExperiences[activeIndex].company}</span>
+                    </h3>
+                  </div>
+                  
+                  <ul className="space-y-4">
+                    {sortedExperiences[activeIndex].achievements.map((ach, idx) => (
+                      <li key={idx} className="text-gray-300 flex gap-4 leading-relaxed text-sm">
+                        <span className="text-blue-500 mt-1.5 shrink-0"><ChevronRight size={16} /></span>
+                        <span>{ach}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
               </div>
-              
-              <ul className="space-y-4 mt-8">
-                {sortedExperiences[activeIndex].achievements.map((ach, idx) => (
-                  <motion.li 
-                    key={idx} 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="text-gray-300 flex gap-4 leading-relaxed"
-                  >
-                    <span className="text-blue-500 mt-1.5 shrink-0"><ChevronRight size={16} /></span> 
-                    <span>{ach}</span>
-                  </motion.li>
-                ))}
-              </ul>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -698,15 +719,19 @@ const ProjectsSection = () => {
           ))
         ) : (
           filteredRepos.map((repo) => (
-            <Tilt key={repo.id} tiltMaxAngleX={10} tiltMaxAngleY={10} scale={1.02} transitionSpeed={2000} className="h-full">
+            <Tilt key={repo.id} tiltMaxAngleX={15} tiltMaxAngleY={15} scale={1.05} transitionSpeed={2000} className="h-full" perspective={1000}>
               <motion.div 
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass-card flex flex-col group h-full hover:border-blue-500/30 transition-colors"
+                className="glass-card flex flex-col group h-full hover:border-blue-500/50 transition-colors relative overflow-visible"
+                style={{ transformStyle: 'preserve-3d' }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <Terminal className="text-blue-500" size={20} />
+                {/* Holographic glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-blue-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-blue-500/10 rounded-2xl transition-all duration-500" style={{ transform: 'translateZ(-10px)' }} />
+                
+                <div className="flex justify-between items-start mb-4" style={{ transform: 'translateZ(40px)' }}>
+                  <Terminal className="text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" size={24} />
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-xs text-gray-400">
                       <Star size={12} className="text-yellow-500" /> {repo.stargazers_count}
@@ -716,19 +741,19 @@ const ProjectsSection = () => {
                     </a>
                   </div>
                 </div>
-                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{repo.name}</h3>
-                <p className="text-sm text-gray-400 mb-6 line-clamp-3 flex-grow">
+                <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors drop-shadow-md" style={{ transform: 'translateZ(50px)' }}>{repo.name}</h3>
+                <p className="text-sm text-gray-300 mb-6 line-clamp-3 flex-grow" style={{ transform: 'translateZ(30px)' }}>
                   {repo.description || "No description provided for this repository."}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-auto">
+                <div className="flex flex-wrap gap-2 mt-auto" style={{ transform: 'translateZ(40px)' }}>
                   {repo.language && (
-                    <span className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-blue-400 border border-white/10">
+                    <span className="px-2 py-1 rounded bg-blue-500/20 text-[10px] font-mono text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">
                       {repo.language}
                     </span>
                   )}
                   {repo.topics?.slice(0, 3).map(topic => (
-                    <span key={topic} className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-gray-400 border border-white/10">
-                      #{topic}
+                    <span key={topic} className="px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-gray-300 border border-white/10">
+                      {topic}
                     </span>
                   ))}
                 </div>
@@ -795,25 +820,15 @@ const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Skills Radar */}
-        <div className="glass-card lg:col-span-1">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <BrainCircuit size={18} className="text-blue-500" /> Skill Proficiency
+        {/* 3D Skill Sphere */}
+        <div className="glass-card lg:col-span-1 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+          <h3 className="text-lg font-bold mb-2 flex items-center gap-2 w-full self-start z-10">
+            <BrainCircuit size={18} className="text-blue-500" /> Tech Stack
           </h3>
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={skillsData}>
-                <PolarGrid stroke="var(--theme-glass-border)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--theme-gray-400)', fontSize: 10 }} />
-                <Radar
-                  name="Proficiency"
-                  dataKey="A"
-                  stroke="var(--color-accent)"
-                  fill="var(--color-accent)"
-                  fillOpacity={0.5}
-                />
-              </RadarChart>
-            </ResponsiveContainer>
+          <p className="text-xs text-gray-500 mb-4 w-full self-start z-10">Drag to rotate the sphere</p>
+          <div className="flex-grow w-full flex items-center justify-center z-10">
+            <SkillSphere skills={['MuleSoft', 'Pega', 'Python', 'React', 'AWS', 'GCP', 'Docker', 'Kubernetes', 'TypeScript', 'Node.js', 'Firebase', 'SQL', 'Git', 'Agile', 'API Design']} />
           </div>
         </div>
 
