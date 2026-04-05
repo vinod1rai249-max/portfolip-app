@@ -931,9 +931,26 @@ const getCertLogo = (title: string, issuer: string) => {
   if (text.includes('docker')) return 'https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg';
   if (text.includes('python')) return 'https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg';
   if (text.includes('react')) return 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg';
+  if (text.includes('pmp') || text.includes('project management')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Project_Management_Institute_Logo.svg/512px-Project_Management_Institute_Logo.svg.png';
   
   // Fallback generic badge
   return 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
+};
+
+const formatCertTitle = (title: string) => {
+  if (title.includes('CERTIFICATION_Pega Certified Senior System Architect')) return 'Pega Certified Senior System Architect';
+  if (title.includes('CERTIFICATION_Pega Certified System Architect')) return 'Pega Certified System Architect';
+  if (title.includes('Mulesoft_MCD_level_1')) return 'MuleSoft Certified Developer - Level 1';
+  if (title.includes('Vinod_PMP_certificate')) return 'Project Management Professional (PMP)';
+  return title;
+};
+
+const formatCertIssuer = (issuer: string) => {
+  if (issuer.includes('Pega Certified Senior system Architect')) return 'Pegasystems';
+  if (issuer.includes('Pega Certified System Architect')) return 'Pegasystems';
+  if (issuer.includes('mulesoft_MCD_level1')) return 'MuleSoft';
+  if (issuer.includes('Vinod_PMP_certificate')) return 'Project Management Institute';
+  return issuer;
 };
 
 const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievement[], isAdmin: boolean }) => {
@@ -1072,7 +1089,7 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
             <motion.div 
               whileHover={{ y: -5 }}
               onClick={() => setSelectedAch(ach)}
-              className="glass-card flex flex-col items-center text-center group cursor-pointer relative h-full hover:border-blue-500/50 transition-all overflow-hidden"
+              className="glass-card p-0 flex flex-col items-center text-center group cursor-pointer relative h-full hover:border-blue-500/50 transition-all overflow-hidden"
             >
               {isAdmin && (
                 <button
@@ -1083,21 +1100,37 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                   <Trash2 size={16} />
                 </button>
               )}
-              <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 overflow-hidden p-3 border border-white/10 group-hover:border-blue-500/50 group-hover:bg-white/10 transition-all duration-500">
+              
+              {/* Thumbnail Area */}
+              <div className="w-full h-48 relative overflow-hidden border-b border-white/10 flex-shrink-0 flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-[#0a0f1c] to-black group-hover:from-slate-800 transition-all duration-500">
+                {/* Decorative background glow */}
+                <div className="absolute inset-0 overflow-hidden opacity-30 pointer-events-none">
+                  <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/40 transition-colors duration-700"></div>
+                  <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/40 transition-colors duration-700"></div>
+                </div>
+                
                 <img 
                   src={getCertLogo(ach.title, ach.issuer)} 
                   alt={ach.title} 
-                  className="w-full h-full object-contain drop-shadow-md"
+                  className="w-28 h-28 object-contain relative z-10 group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
                   }}
                 />
               </div>
-              <h3 className="font-bold mb-2">{ach.title}</h3>
-              <p className="text-sm text-gray-500 mb-4">{ach.issuer}</p>
-              <div className="text-xs font-mono text-blue-400 mb-6">{ach.date}</div>
-              <div className="mt-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-blue-400 transition-colors">
-                View Certificate <ExternalLink size={12} />
+
+              {/* Content Area */}
+              <div className="p-6 flex flex-col items-center text-center flex-1 w-full">
+                <h3 className="font-bold mb-2 line-clamp-2">{formatCertTitle(ach.title)}</h3>
+                {ach.title !== 'Safe Agile 5.0' && (
+                  <>
+                    <p className="text-sm text-gray-500 mb-4">{formatCertIssuer(ach.issuer)}</p>
+                    <div className="text-xs font-mono text-blue-400 mb-6">{ach.date}</div>
+                  </>
+                )}
+                <div className="mt-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-blue-400 transition-colors">
+                  View Certificate <ExternalLink size={12} />
+                </div>
               </div>
             </motion.div>
           </Tilt>
@@ -1215,14 +1248,14 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                 <ChevronRight className="rotate-90" />
               </button>
               
-              <div className="grid md:grid-cols-2">
-                <div className="aspect-[4/3] bg-white/5 flex items-center justify-center overflow-hidden border-r border-white/10 relative">
+              <div className="flex flex-col">
+                <div className="h-[60vh] border-b bg-gradient-to-b from-black/60 to-black/90 flex items-center justify-center overflow-hidden border-white/10 relative p-8">
                   {selectedAch.certificateUrl?.startsWith('data:application/pdf') ? (
                     pdfBlobUrl ? (
                       <object 
-                        data={pdfBlobUrl} 
+                        data={pdfBlobUrl + '#toolbar=0&navpanes=0&scrollbar=0'} 
                         type="application/pdf"
-                        className="w-full h-full absolute inset-0"
+                        className="w-full h-full max-w-4xl border border-white/10 shadow-2xl shadow-black/80 rounded bg-white relative z-10"
                       >
                         <div className="flex flex-col items-center justify-center h-full p-6 text-center z-10 relative bg-black/50">
                           <FileText size={48} className="text-gray-400 mb-4" />
@@ -1244,29 +1277,37 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                     <img 
                       src={selectedAch.certificateUrl || `https://picsum.photos/seed/${selectedAch.id}/800/600`} 
                       alt={selectedAch.title} 
-                      className="w-full h-full object-cover"
+                      className="max-w-full max-h-full object-contain border border-white/10 shadow-2xl shadow-black/80 rounded relative z-10"
                       referrerPolicy="no-referrer"
                     />
                   )}
                 </div>
-                <div className="p-8 flex flex-col">
-                  <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
-                    <span className="text-2xl">{selectedAch.icon}</span>
-                  </div>
-                  <h3 className="text-2xl font-display font-bold mb-2">{selectedAch.title}</h3>
-                  <p className="text-blue-400 font-medium mb-4">{selectedAch.issuer}</p>
-                  <div className="text-sm text-gray-400 mb-8 leading-relaxed">
-                    {selectedAch.description || `Official certification issued in ${selectedAch.date}. This credential verifies the technical proficiency and expertise in ${selectedAch.title.split(' ')[0]} systems and methodologies.`}
-                  </div>
-                  <div className="mt-auto space-y-4">
-                    <div className="flex justify-between text-sm border-b border-white/5 pb-2">
-                      <span className="text-gray-500">Issue Date</span>
-                      <span className="font-mono">{selectedAch.date}</span>
+                <div className="p-8 flex flex-col items-center text-center">
+                  {selectedAch.title !== 'Safe Agile 5.0' && (
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
+                      <span className="text-2xl">{selectedAch.icon}</span>
                     </div>
-                    <div className="flex justify-between text-sm border-b border-white/5 pb-2">
-                      <span className="text-gray-500">Credential ID</span>
-                      <span className="font-mono">VR-{selectedAch.id}-2024</span>
-                    </div>
+                  )}
+                  <h3 className="font-display font-bold mb-2 text-3xl">{formatCertTitle(selectedAch.title)}</h3>
+                  {selectedAch.title !== 'Safe Agile 5.0' && (
+                    <>
+                      <p className="text-blue-400 font-medium mb-4">{formatCertIssuer(selectedAch.issuer)}</p>
+                      <div className="text-sm text-gray-400 mb-8 leading-relaxed max-w-2xl">
+                        {selectedAch.description || `Official certification issued in ${selectedAch.date}. This credential verifies the technical proficiency and expertise in ${formatCertTitle(selectedAch.title).split(' ')[0]} systems and methodologies.`}
+                      </div>
+                      <div className="mt-auto space-y-4 w-full max-w-md">
+                        <div className="flex justify-between text-sm border-b border-white/5 pb-2">
+                          <span className="text-gray-500">Issue Date</span>
+                          <span className="font-mono">{selectedAch.date}</span>
+                        </div>
+                        <div className="flex justify-between text-sm border-b border-white/5 pb-2">
+                          <span className="text-gray-500">Credential ID</span>
+                          <span className="font-mono">VR-{selectedAch.id}-2024</span>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  <div className="mt-auto space-y-4 pt-6 w-full max-w-md">
                     {selectedAch.link !== '#' && (
                       <a 
                         href={selectedAch.link}
@@ -1274,15 +1315,6 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                         className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold flex items-center justify-center gap-2 transition-all mt-6"
                       >
                         Verify on Official Site <ExternalLink size={16} />
-                      </a>
-                    )}
-                    {selectedAch.certificateUrl && (
-                      <a 
-                        href={selectedAch.certificateUrl}
-                        download={`${selectedAch.title.replace(/\s+/g, '_')}_Certificate`}
-                        className="w-full py-3 glass hover:bg-white/10 rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
-                      >
-                        Download Document <Download size={16} />
                       </a>
                     )}
                     {isAdmin && (
@@ -1690,16 +1722,13 @@ export default function App() {
   const isAdmin = user?.email === 'vinod1rai249@gmail.com';
 
   useEffect(() => {
-    // Check initial theme from localStorage or system preference
+    // Check initial theme from localStorage
     const savedTheme = localStorage.getItem('theme') as 'dark' | 'light' | null;
     if (savedTheme) {
       setTheme(savedTheme);
       if (savedTheme === 'light') {
         document.documentElement.classList.add('light');
       }
-    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      setTheme('light');
-      document.documentElement.classList.add('light');
     }
 
     const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -1936,14 +1965,23 @@ export default function App() {
       }
 
       // Clean up the title text without removing the certification itself
-      const processedAchievements = firestoreAchievements.map(a => ({
-        ...a,
-        title: a.title
+      const processedAchievements = firestoreAchievements.map(a => {
+        let cleanTitle = a.title
           .replace(/PrintAchievemen?t?\s*-\s*Vinod Rai_compressed/gi, '')
           .replace(/PrintAchievemen?t?/gi, '') // Just in case it's only this word
           .replace(/^-\s*/, '') // Remove leading hyphens if any are left
-          .trim() || 'Certification' // Fallback if the title becomes completely empty
-      }));
+          .trim();
+          
+        // Force exact title for Safe Agile
+        if (cleanTitle.toLowerCase().includes('safe') || cleanTitle.toLowerCase().includes('agile')) {
+          cleanTitle = 'Safe Agile 5.0';
+        }
+        
+        return {
+          ...a,
+          title: cleanTitle || 'Certification' // Fallback if the title becomes completely empty
+        };
+      });
       setAchievements(processedAchievements);
     }, (error) => {
       console.error("Error fetching achievements:", error);
