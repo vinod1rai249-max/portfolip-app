@@ -1087,8 +1087,10 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
   };
 
   return (
-    <section id="achievements" className="py-24 max-w-7xl mx-auto px-6">
-      <div className="flex items-center gap-4 mb-16">
+    <section id="achievements" className="relative py-24 overflow-hidden">
+      <Hero3D />
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="flex items-center gap-4 mb-16">
         <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-blue-500">
           <Award size={24} />
         </div>
@@ -1357,6 +1359,7 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </section>
   );
 };
