@@ -17,7 +17,8 @@ service cloud.firestore {
     // User Profiles: Publicly readable, only owner/admin can write
     match /users/{userId} {
       allow read: if true;
-      allow write: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin() || 
+                   (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resumeViews', 'resumeDownloads']));
 
       match /experience/{expId} {
         allow read: if true;

@@ -20,7 +20,7 @@ const generateParticles = (count: number) => {
 
 const ParticleCloud = () => {
   const ref = useRef<THREE.Points>(null);
-  const sphere = useMemo(() => generateParticles(3000), []);
+  const sphere = useMemo(() => generateParticles(1000), []);
 
   useFrame((state, delta) => {
     if (ref.current) {

@@ -1127,9 +1127,9 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                 </div>
                 
                 <img 
-                  src={getCertLogo(ach.title, ach.issuer)} 
+                  src={ach.certificateUrl || getCertLogo(ach.title, ach.issuer)} 
                   alt={ach.title} 
-                  className="w-28 h-28 object-contain relative z-10 group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                  className="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
                   }}
@@ -1976,10 +1976,12 @@ export default function App() {
       // Auto-delete duplicate "PrintAchievemen - Vinod Rai_compressed"
       const duplicates = firestoreAchievements.filter(a => a.title.includes('PrintAchievemen'));
       if (duplicates.length > 1) {
-        // Delete the first one (oldest or newest depending on sort, let's just delete the first one in the array)
-        deleteDoc(doc(db, 'users', 'vinod-rai-profile', 'achievements', duplicates[0].id))
-          .then(() => console.log('Deleted duplicate achievement'))
-          .catch(e => console.error('Error deleting duplicate', e));
+        // We only want to attempt deletion if we are an admin to prevent permission errors for guests
+        if (isAdmin) {
+           deleteDoc(doc(db, 'users', 'vinod-rai-profile', 'achievements', duplicates[0].id))
+            .then(() => console.log('Deleted duplicate achievement'))
+            .catch(e => console.error('Error deleting duplicate', e));
+        }
       }
 
       // Clean up the title text without removing the certification itself
