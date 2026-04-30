@@ -43,13 +43,14 @@ export interface LearningProgress {
 }
 
 export interface GithubRepo {
-  id: number;
+  id: number | string;
   name: string;
   description: string;
   stargazers_count: number;
   language: string;
   html_url: string;
   topics: string[];
+  live_url?: string;
 }
 
 export interface ChatMessage {

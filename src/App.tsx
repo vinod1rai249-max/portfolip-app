@@ -634,31 +634,51 @@ const ProjectsSection = () => {
   const [filter, setFilter] = useState('All');
   const [loading, setLoading] = useState(true);
 
+  const featuredProjects: GithubRepo[] = [
+    {
+      id: 'adpo',
+      name: 'AI Incident Debugging Agent',
+      description: 'An intelligent automation system with a complex Mixture of Agents pipeline that parses crash logs and autonomously suggests root causes and fixes.',
+      stargazers_count: 142,
+      language: 'Python',
+      topics: ['genai', 'agents', 'rag', 'fastapi'],
+      html_url: 'https://github.com/vinod1rai249-max/ai-incident-debugging-agent',
+      live_url: 'https://github.com/vinod1rai249-max/ai-incident-debugging-agent'
+    },
+    {
+      id: 'chatbot',
+      name: 'RAG Document Chat Bot',
+      description: 'An interactive Streamlit-based AI application acting as an intelligent layer over enterprise documents for conversational queries and high-accuracy retrieval.',
+      stargazers_count: 89,
+      language: 'Python',
+      topics: ['streamlit', 'rag', 'genai', 'pinecone'],
+      html_url: 'https://github.com/vinod1rai249-max/document_chat_bot',
+      live_url: 'https://document-chat-bot-vinod.streamlit.app'
+    }
+  ];
+
   useEffect(() => {
     const fetchRepos = async () => {
       try {
         const response = await fetch('https://api.github.com/users/vinod1rai249-max/repos?sort=updated&per_page=100');
         if (response.ok) {
           const data = await response.json();
+          const finalRepos = [...featuredProjects];
           if (data.length > 0) {
-            setRepos(data);
-          } else {
-            // Fallback if no public repos found
-            setRepos([
-              {
-                id: 1,
-                name: 'GenAI-Enterprise-Architecture',
-                description: 'Enterprise integration patterns using GenAI, MuleSoft, and Pega on Cloud infrastructure.',
-                stargazers_count: 84,
-                language: 'Python',
-                html_url: 'https://github.com/vinod1rai249-max?tab=repositories',
-                topics: ['genai', 'mulesoft', 'pega', 'cloud']
-              }
-            ]);
+            const fetchedFiltered = data.filter((r: any) => 
+              r.name !== 'ai-incident-debugging-agent' && 
+              r.name !== 'document_chat_bot' &&
+              r.name !== 'GenAI-Enterprise-Architecture' // Avoid conflict with fallback
+            );
+            finalRepos.push(...fetchedFiltered);
           }
+          setRepos(finalRepos);
+        } else {
+          setRepos(featuredProjects);
         }
       } catch (error) {
         console.error('Error fetching repos:', error);
+        setRepos(featuredProjects);
       } finally {
         setLoading(false);
       }
@@ -734,16 +754,13 @@ const ProjectsSection = () => {
                     <div className="flex items-center gap-1 text-xs text-gray-400">
                       <Star size={12} className="text-yellow-500" /> {repo.stargazers_count}
                     </div>
-                    <a href={repo.html_url} target="_blank" className="text-gray-400 hover:text-white transition-colors">
-                      <ExternalLink size={18} />
-                    </a>
                   </div>
                 </div>
                 <h3 className="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors drop-shadow-md" style={{ transform: 'translateZ(50px)' }}>{repo.name}</h3>
                 <p className="text-sm text-gray-300 mb-6 line-clamp-3 flex-grow" style={{ transform: 'translateZ(30px)' }}>
                   {repo.description || "No description provided for this repository."}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-auto" style={{ transform: 'translateZ(40px)' }}>
+                <div className="flex flex-wrap gap-2 mt-auto mb-4" style={{ transform: 'translateZ(40px)' }}>
                   {repo.language && (
                     <span className="px-2 py-1 rounded bg-blue-500/20 text-[10px] font-mono text-blue-300 border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">
                       {repo.language}
@@ -754,6 +771,17 @@ const ProjectsSection = () => {
                       {topic}
                     </span>
                   ))}
+                </div>
+                {/* Project Links */}
+                <div className="flex gap-3 border-t border-white/10 pt-4" style={{ transform: 'translateZ(30px)' }}>
+                  {repo.live_url && (
+                    <a href={repo.live_url} target="_blank" className="flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition-colors">
+                      <ExternalLink size={14} /> Live App
+                    </a>
+                  )}
+                  <a href={repo.html_url} target="_blank" className="flex items-center gap-2 text-xs font-bold text-gray-300 bg-white/5 hover:bg-white/15 border border-white/10 px-4 py-2 rounded-lg transition-colors">
+                    <Github size={14} /> Code
+                  </a>
                 </div>
               </motion.div>
             </Tilt>
@@ -1735,44 +1763,41 @@ const LiveDemoSection = () => {
         </div>
         <div>
           <h2 className="text-3xl font-display font-bold">Interactive QA Bot</h2>
-          <p className="text-gray-500">Ask questions about my experience directly via this RAG chatbot.</p>
+          <p className="text-gray-500">Ask questions about my experience directly via this live RAG chatbot.</p>
         </div>
       </div>
       
-      <div className="w-full glass rounded-3xl overflow-hidden shadow-2xl relative border border-white/10">
-        <div className="absolute top-0 left-0 right-0 h-10 bg-[#0a0f1c]/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 gap-2 z-10">
+      <div className="w-full glass rounded-3xl overflow-hidden shadow-2xl relative border border-white/10 flex flex-col h-[600px]">
+        <div className="h-10 bg-[#0a0f1c]/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 gap-2 z-10 shrink-0">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
           </div>
-          <div className="ml-4 text-xs font-mono text-gray-500 flex items-center gap-2">
-            <Terminal size={12} /> document-chat-bot-vinod.streamlit.app
+          <div className="ml-4 text-xs font-mono text-gray-500 flex items-center justify-between flex-grow">
+            <div className="flex items-center gap-2">
+              <Terminal size={12} /> document-chat-bot-vinod.streamlit.app
+            </div>
+            <div className="hidden sm:flex text-gray-400 text-[10px] items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              If bot is sleeping, wait 10s to wake up
+            </div>
           </div>
         </div>
         
-        <div className="w-full flex flex-col items-center justify-center py-24 px-6 bg-[#0E1117] relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
-          
-          <div className="w-20 h-20 rounded-full glass flex items-center justify-center text-blue-400 mb-6 relative group overflow-hidden">
-             <div className="absolute inset-0 bg-blue-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-             <BrainCircuit size={32} className="relative z-10 w-8 h-8 group-hover:scale-110 transition-transform" />
+        <div className="flex-grow w-full bg-[#0E1117] relative">
+          <iframe 
+            src="https://document-chat-bot-vinod.streamlit.app/?embed=true"
+            className="w-full h-full border-none absolute inset-0 z-20"
+            title="Interactive QA Bot"
+            loading="lazy"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+          />
+          {/* Loading background while iframe loads */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+            <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-4" />
+            <p className="text-gray-500 text-sm font-mono tracking-widest uppercase">Initializing Agent...</p>
           </div>
-          
-          <h3 className="text-2xl font-bold text-white mb-3">Live Demo Paused</h3>
-          <p className="text-gray-400 text-center max-w-md mb-8">
-            The Streamlit cloud app has gone to sleep due to inactivity. Click below to wake it up and chat with the AI assistant in a new tab.
-          </p>
-          
-          <a
-            href="https://document-chat-bot-vinod.streamlit.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]"
-          >
-            Launch Interactive QA Bot
-            <ExternalLink size={18} />
-          </a>
         </div>
       </div>
     </section>
