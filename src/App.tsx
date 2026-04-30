@@ -6,7 +6,8 @@ import {
   MessageSquare, Send, User, ChevronRight,
   Terminal, Zap, Star, Filter, Download,
   BarChart3, BrainCircuit, Rocket, GraduationCap,
-  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2, Network
+  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2, Network,
+  Lock, Layers, Activity
 } from 'lucide-react';
 import { 
   collection, query, orderBy, onSnapshot, addDoc, serverTimestamp,
@@ -35,6 +36,7 @@ import {
 import { Hero3D } from './components/Hero3D';
 import { SkillSphere } from './components/SkillSphere';
 import mermaid from 'mermaid';
+import { IIT_ROORKEE_BG } from './assets';
 
 enum OperationType {
   CREATE = 'create',
@@ -643,7 +645,17 @@ const ProjectsSection = () => {
       language: 'Python',
       topics: ['genai', 'agents', 'rag', 'fastapi'],
       html_url: 'https://github.com/vinod1rai249-max/ai-incident-debugging-agent',
-      live_url: 'https://github.com/vinod1rai249-max/ai-incident-debugging-agent'
+      live_url: 'https://adpo-dashboard-6kwsju4cmq-uc.a.run.app/'
+    },
+    {
+      id: 'adpo-health',
+      name: 'ADPO Health Agent Dashboard',
+      description: 'A comprehensive health agent dashboard for real-time monitoring and diagnostics, built on modern React and AI architectures.',
+      stargazers_count: 115,
+      language: 'TypeScript',
+      topics: ['dashboard', 'health-agent', 'react', 'genai'],
+      html_url: 'https://github.com/vinod1rai249-max',
+      live_url: 'https://adpo-health-agent-dashboard.vercel.app/'
     },
     {
       id: 'chatbot',
@@ -669,7 +681,10 @@ const ProjectsSection = () => {
               r.name !== 'ai-incident-debugging-agent' && 
               r.name !== 'document_chat_bot' &&
               r.name !== 'GenAI-Enterprise-Architecture' // Avoid conflict with fallback
-            );
+            ).map((r: any) => ({
+              ...r,
+              description: r.description || `A ${r.language || 'software'} project exploring modern engineering patterns.`
+            }));
             finalRepos.push(...fetchedFiltered);
           }
           setRepos(finalRepos);
@@ -959,10 +974,12 @@ const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
 
 const getCertLogo = (title: string, issuer: string) => {
   const text = `${title} ${issuer}`.toLowerCase();
-  if (text.includes('mulesoft')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/MuleSoft_Logo.svg/512px-MuleSoft_Logo.svg.png';
-  if (text.includes('pega')) return 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Pegasystems_logo.svg/512px-Pegasystems_logo.svg.png';
-  if (text.includes('aws') || text.includes('amazon')) return 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg';
-  if (text.includes('google') || text.includes('gcp')) return 'https://upload.wikimedia.org/wikipedia/commons/5/51/Google_Cloud_logo.svg';
+  
+  if (text.includes('iit') || text.includes('roorkee') || text.includes('agentic')) return IIT_ROORKEE_BG;
+  if (text.includes('mulesoft')) return 'https://images.credly.com/size/340x340/images/d12b10a2-23f2-4bd5-946f-c1f93f6b4d58/MuleSoft_Certified_Developer_-_Level_1.png';
+  if (text.includes('pega')) return 'https://images.credly.com/size/340x340/images/6bc029f9-6799-4d6b-88a2-23e59ea24d55/image.png';
+  if (text.includes('aws') || text.includes('amazon')) return 'https://images.credly.com/size/340x340/images/0e284c3f-5164-4b21-8660-0d84737941bc/image.png';
+  if (text.includes('google') || text.includes('gcp')) return 'https://images.credly.com/size/340x340/images/ae2f5bae-b110-4ea1-8e26-77cf5f76c81e/image.png';
   if (text.includes('microsoft') || text.includes('azure')) return 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Microsoft_Azure_Logo.svg';
   if (text.includes('salesforce')) return 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg';
   if (text.includes('oracle')) return 'https://upload.wikimedia.org/wikipedia/commons/5/50/Oracle_logo.svg';
@@ -1157,7 +1174,11 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                   alt={ach.title} 
                   className="w-full h-full object-cover relative z-10 group-hover:scale-110 transition-transform duration-700 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
+                    if (ach.id === 'iit-roorkee-genai' || ach.title.toLowerCase().includes('iit')) {
+                      (e.target as HTMLImageElement).src = IIT_ROORKEE_BG;
+                    } else {
+                      (e.target as HTMLImageElement).src = 'https://cdn-icons-png.flaticon.com/512/2874/2874368.png';
+                    }
                   }}
                 />
               </div>
@@ -1322,6 +1343,11 @@ const AchievementsSection = ({ achievements, isAdmin }: { achievements: Achievem
                       alt={selectedAch.title} 
                       className="max-w-full max-h-full object-contain border border-white/10 shadow-2xl shadow-black/80 rounded relative z-10"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        if (selectedAch.id === 'iit-roorkee-genai' || selectedAch.title.toLowerCase().includes('iit')) {
+                          (e.target as HTMLImageElement).src = IIT_ROORKEE_BG;
+                        }
+                      }}
                     />
                   )}
                 </div>
@@ -1755,48 +1781,103 @@ const ReactionsWidget = () => {
 
 
 const LiveDemoSection = () => {
+  const [activeDemo, setActiveDemo] = useState<'adpoHealth' | 'adpo' | 'chatbot'>('adpoHealth');
+
+  const demos = {
+    adpoHealth: {
+      title: 'ADPO Health Agent Dashboard',
+      desc: 'Real-time monitoring and diagnostics interface built with React.',
+      url: 'https://adpo-health-agent-dashboard.vercel.app/',
+      domain: 'adpo-health-agent-dashboard.vercel.app',
+      icon: <Network size={20} />
+    },
+    adpo: {
+      title: 'ADPO Diagnostic Agent',
+      desc: 'Live incident debugging FastAPI backend processing crash logs.',
+      url: 'https://adpo-dashboard-6kwsju4cmq-uc.a.run.app/',
+      domain: 'adpo-dashboard.a.run.app',
+      icon: <Activity size={20} />
+    },
+    chatbot: {
+      title: 'Interactive QA Bot',
+      desc: 'Ask questions about my experience using this Streamlit RAG chatbot.',
+      url: 'https://document-chat-bot-vinod.streamlit.app/?embed=true',
+      domain: 'document-chat-bot-vinod.streamlit.app',
+      icon: <BrainCircuit size={20} />
+    }
+  };
+
+  const currentDemo = demos[activeDemo];
+
   return (
     <section id="live-demo" className="py-24 max-w-7xl mx-auto px-6">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-blue-500">
-          <BrainCircuit size={24} />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-blue-500">
+            <Layers size={24} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-display font-bold">Live Applications</h2>
+            <p className="text-gray-500">Test drive my AI & agentic architectures right now.</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-3xl font-display font-bold">Interactive QA Bot</h2>
-          <p className="text-gray-500">Ask questions about my experience directly via this live RAG chatbot.</p>
+        
+        {/* Tabs */}
+        <div className="flex gap-2 bg-white/5 p-1 rounded-xl border border-white/10 self-start md:self-auto overflow-x-auto w-full md:w-auto">
+          {(Object.keys(demos) as Array<keyof typeof demos>).map(key => (
+            <button
+              key={key}
+              onClick={() => setActiveDemo(key)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
+                activeDemo === key 
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              {demos[key].icon}
+              {demos[key].title}
+            </button>
+          ))}
         </div>
       </div>
       
-      <div className="w-full glass rounded-3xl overflow-hidden shadow-2xl relative border border-white/10 flex flex-col h-[600px]">
-        <div className="h-10 bg-[#0a0f1c]/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 gap-2 z-10 shrink-0">
-          <div className="flex gap-1.5">
+      <div className="w-full glass rounded-3xl overflow-hidden shadow-2xl relative border border-white/10 flex flex-col h-[600px] md:h-[700px]">
+        {/* Browser Toolbar */}
+        <div className="h-12 bg-[#0a0f1c]/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 gap-4 z-10 shrink-0">
+          <div className="flex gap-1.5 shrink-0">
             <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
             <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
           </div>
-          <div className="ml-4 text-xs font-mono text-gray-500 flex items-center justify-between flex-grow">
-            <div className="flex items-center gap-2">
-              <Terminal size={12} /> document-chat-bot-vinod.streamlit.app
+          
+          {/* URL Bar */}
+          <div className="flex-grow max-w-2xl mx-auto bg-white/5 rounded-md h-7 flex items-center px-3 gap-2 overflow-hidden border border-white/5">
+            <Lock size={12} className="text-green-400 shrink-0" />
+            <div className="text-xs font-mono text-gray-300 truncate">
+              https://{currentDemo.domain}
             </div>
-            <div className="hidden sm:flex text-gray-400 text-[10px] items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              If bot is sleeping, wait 10s to wake up
-            </div>
+          </div>
+          
+          <div className="hidden sm:flex text-gray-400 text-[10px] items-center gap-2 shrink-0 w-24 justify-end">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Online
           </div>
         </div>
         
         <div className="flex-grow w-full bg-[#0E1117] relative">
           <iframe 
-            src="https://document-chat-bot-vinod.streamlit.app/?embed=true"
-            className="w-full h-full border-none absolute inset-0 z-20"
-            title="Interactive QA Bot"
+            key={activeDemo} // Force remount when changing demo
+            src={currentDemo.url}
+            className="w-full h-full border-none absolute inset-0 z-20 bg-white"  // bg-white just in case app expects it
+            title={currentDemo.title}
             loading="lazy"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
           />
           {/* Loading background while iframe loads */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 bg-[#0E1117]">
             <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mb-4" />
-            <p className="text-gray-500 text-sm font-mono tracking-widest uppercase">Initializing Agent...</p>
+            <p className="text-gray-500 text-sm font-mono tracking-widest uppercase">Initializing App...</p>
+            <p className="text-gray-600 text-xs mt-2">{currentDemo.desc}</p>
           </div>
         </div>
       </div>
@@ -2108,10 +2189,10 @@ export default function App() {
         role: 'Technical Lead',
         duration: 'Oct 2018 - Present',
         achievements: [
-          'Specialized in MuleSoft development, taking ownership of implementation and support for enterprise integration.',
-          'Led cross-functional engineering teams overseeing end-to-end delivery of scalable APIs and BPM systems.',
-          'Championed Agile transformation and established DevSecOps practices within the API development lifecycle.',
-          'Developed reusable frameworks and design templates to drive consistency across multiple teams.'
+          'Architected and deployed "ADPO" — an AI-powered agentic system using FastAPI, Gemini Pro, and RAG pipelines that automates crash log diagnostics.',
+          'Built and fine-tuned interactive LLM applications, including an enterprise RAG Document Chat Bot for instantaneous internal knowledge retrieval.',
+          'Drove an ~80% automation uplift in operational efficiency by replacing manual debugging with intelligent, multi-agent AI pipelines.',
+          'Led cross-functional engineering efforts to bridge legacy systems (MuleSoft/Mainframe) with modern Generative AI architectures on AWS/GCP.'
         ],
         order: 1
       },
@@ -2178,7 +2259,7 @@ export default function App() {
       }
 
       // Clean up the title text without removing the certification itself
-      const processedAchievements = firestoreAchievements.map(a => {
+      let processedAchievements = firestoreAchievements.map(a => {
         let cleanTitle = a.title
           .replace(/PrintAchievemen?t?\s*-\s*Vinod Rai_compressed/gi, '')
           .replace(/PrintAchievemen?t?/gi, '') // Just in case it's only this word
@@ -2195,6 +2276,41 @@ export default function App() {
           title: cleanTitle || 'Certification' // Fallback if the title becomes completely empty
         };
       });
+      
+      // Pin IIT Roorkee at the very top.
+      const iitCertInfo = processedAchievements.find(a => 
+        a.title.toLowerCase().includes('iit') || 
+        a.title.toLowerCase().includes('roorkee') ||
+        a.title.toLowerCase().includes('agentic ai')
+      );
+      
+      if (iitCertInfo) {
+        // Enforce the campus photo and remove any login page link
+        const enrichedIitCert = {
+          ...iitCertInfo,
+          certificateUrl: IIT_ROORKEE_BG,
+          link: iitCertInfo.link?.includes('login') ? 'https://iitr.ac.in/' : iitCertInfo.link || 'https://iitr.ac.in/'
+        };
+        processedAchievements = [
+          enrichedIitCert,
+          ...processedAchievements.filter(a => a.id !== iitCertInfo.id)
+        ];
+      } else {
+        processedAchievements = [
+          {
+            id: 'iit-roorkee-genai',
+            title: 'Generative & Agentic AI',
+            issuer: 'IIT Roorkee',
+            date: 'Ongoing',
+            link: 'https://iitr.ac.in/',
+            certificateUrl: IIT_ROORKEE_BG,
+            icon: '🤖',
+            description: 'Advanced certification covering Large Language Models, Multi-Agent pipelines, and intelligent automation systems.'
+          },
+          ...processedAchievements
+        ];
+      }
+      
       setAchievements(processedAchievements);
     }, (error) => {
       console.error("Error fetching achievements:", error);
