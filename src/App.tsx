@@ -369,7 +369,7 @@ const Hero = ({
             Hi, I'm <span className="text-blue-500">Vinod Rai</span>
           </h1>
           <div className="text-xl md:text-2xl font-display text-gray-400 mb-8 max-w-2xl leading-relaxed">
-            Senior GenAI Engineer architecting scalable AI systems, fine-tuning LLMs, and building intelligent data-flow pipelines.
+            Senior GenAI & Integration Architect with <span className="text-white font-bold">20+ years of experience</span>. I build scalable AI systems, fine-tune LLMs, and architect intelligent data-flow pipelines that drive <span className="text-white font-bold">~80% automation uplift</span>.
           </div>
           {/* Removed bio to focus on value proposition */}
           
@@ -516,8 +516,8 @@ const Hero = ({
             <div className="flex gap-1 mb-2">
               {[1, 2, 3].map(i => <div key={i} className="w-1 h-4 bg-blue-500 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />)}
             </div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Processing</div>
-            <div className="text-sm font-bold">98.4% Efficiency</div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Automation Uplift</div>
+            <div className="text-sm font-bold">~80% Efficiency</div>
           </motion.div>
         </motion.div>
       </div>
