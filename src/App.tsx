@@ -7,7 +7,7 @@ import {
   Terminal, Zap, Star, Filter, Download,
   BarChart3, BrainCircuit, Rocket, GraduationCap,
   Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2, Network,
-  Lock, Layers, Activity
+  Lock, Layers, Activity, Shield
 } from 'lucide-react';
 import { 
   collection, query, orderBy, onSnapshot, addDoc, serverTimestamp,
@@ -637,6 +637,16 @@ const ProjectsSection = () => {
   const [loading, setLoading] = useState(true);
 
   const featuredProjects: GithubRepo[] = [
+    {
+      id: 'ai-security-control-plane',
+      name: 'AI Security Control Plane',
+      description: 'A comprehensive control plane for managing and monitoring AI system security, enforcing policies, and auditing GenAI pipelines.',
+      stargazers_count: 89,
+      language: 'Python',
+      topics: ['security', 'streamlit', 'control-plane', 'genai'],
+      html_url: 'https://github.com/vinod1rai249-max',
+      live_url: 'https://ai-security-control-plane-kfodtopox8ax6hfpvsousz.streamlit.app/'
+    },
     {
       id: 'adpo',
       name: 'AI Incident Debugging Agent',
@@ -1781,7 +1791,7 @@ const ReactionsWidget = () => {
 
 
 const LiveDemoSection = () => {
-  const [activeDemo, setActiveDemo] = useState<'adpoHealth' | 'adpo' | 'chatbot'>('adpoHealth');
+  const [activeDemo, setActiveDemo] = useState<'adpoHealth' | 'adpo' | 'chatbot' | 'securityControlPlane'>('adpoHealth');
 
   const demos = {
     adpoHealth: {
@@ -1804,6 +1814,13 @@ const LiveDemoSection = () => {
       url: 'https://document-chat-bot-vinod.streamlit.app/?embed=true',
       domain: 'document-chat-bot-vinod.streamlit.app',
       icon: <BrainCircuit size={20} />
+    },
+    securityControlPlane: {
+      title: 'AI Security Control Plane',
+      desc: 'Manage AI system security, enforce policies, and audit GenAI pipelines.',
+      url: 'https://ai-security-control-plane-kfodtopox8ax6hfpvsousz.streamlit.app/?embed=true',
+      domain: 'ai-security-control-plane-kfodtopox8ax6hfpvsousz.streamlit.app',
+      icon: <Shield size={20} />
     }
   };
 
