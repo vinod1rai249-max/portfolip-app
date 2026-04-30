@@ -6,7 +6,7 @@ import {
   MessageSquare, Send, User, ChevronRight,
   Terminal, Zap, Star, Filter, Download,
   BarChart3, BrainCircuit, Rocket, GraduationCap,
-  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2
+  Camera, Loader2, Menu, X, FileText, Eye, Upload, Sun, Moon, Trash2, Network
 } from 'lucide-react';
 import { 
   collection, query, orderBy, onSnapshot, addDoc, serverTimestamp,
@@ -34,6 +34,7 @@ import {
 } from './types';
 import { Hero3D } from './components/Hero3D';
 import { SkillSphere } from './components/SkillSphere';
+import mermaid from 'mermaid';
 
 enum OperationType {
   CREATE = 'create',
@@ -169,7 +170,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: 'dark' | 'light', toggleTheme: 
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <Cpu size={18} className="text-[#ffffff]" />
           </div>
-          <span>NEXUS<span className="text-blue-500">.AI</span></span>
+          <span>VINOD<span className="text-blue-500">.AI</span></span>
         </motion.div>
         
         <div className="hidden md:flex items-center gap-8">
@@ -203,7 +204,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: 'dark' | 'light', toggleTheme: 
               <span className="text-[10px] font-bold uppercase tracking-widest hidden xl:block">GitHub</span>
             </a>
             <a 
-              href="https://www.linkedin.com/in/vinod-rai-23b706392/" 
+              href="https://www.linkedin.com/feed/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
@@ -271,7 +272,7 @@ const Navbar = ({ theme, toggleTheme }: { theme: 'dark' | 'light', toggleTheme: 
                 <a href="https://github.com/vinod1rai249-max" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                   <Github size={20} />
                 </a>
-                <a href="https://www.linkedin.com/in/vinod-rai-23b706392/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                <a href="https://www.linkedin.com/feed/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
                   <Linkedin size={20} />
                 </a>
                 <a href="mailto:vinod1rai249@gmail.com" className="text-gray-400 hover:text-white">
@@ -318,7 +319,7 @@ const Hero = ({
   handleResumeView: () => Promise<void>;
 }) => {
   const [text, setText] = useState('');
-  const roles = ["AI Enthusiast", "Python Developer", "Cloud Learner", "Problem Solver"];
+  const roles = ["GenAI Engineer", "Integration Architect", "Cloud Specialist", "Pega / Mainframe Expert"];
   const [roleIndex, setRoleIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(150);
@@ -365,18 +366,16 @@ const Hero = ({
             <Zap size={12} /> Available for projects
           </div>
           <h1 className="text-6xl md:text-8xl font-display font-bold leading-tight mb-6">
-            Hi, I'm <span className="text-blue-500">{profile.name.split(' ')[0]}</span>
+            Hi, I'm <span className="text-blue-500">Vinod Rai</span>
           </h1>
-          <div className="text-2xl md:text-3xl font-display text-gray-400 mb-8 h-12">
-            I am a <span className="text-white border-r-2 border-blue-500 pr-1">{text}</span>
+          <div className="text-xl md:text-2xl font-display text-gray-400 mb-8 max-w-2xl leading-relaxed">
+            Senior GenAI Engineer architecting scalable AI systems, fine-tuning LLMs, and building intelligent data-flow pipelines.
           </div>
-          <p className="text-lg text-gray-400 max-w-lg mb-10 leading-relaxed">
-            {profile.bio}
-          </p>
+          {/* Removed bio to focus on value proposition */}
           
           <div className="flex items-center gap-6 mb-10">
             <a 
-              href="https://www.linkedin.com/in/vinod-rai-23b706392/" 
+              href="https://www.linkedin.com/feed/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-all group"
@@ -408,49 +407,38 @@ const Hero = ({
             </a>
           </div>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 mt-8">
             <a href="#projects" className="px-8 py-4 bg-white text-black rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-all">
               View Projects <ChevronRight size={20} />
             </a>
-            <button 
-              onClick={() => {
-                const chatBtn = document.querySelector('button[class*="w-14 h-14"]') as HTMLButtonElement;
-                if (chatBtn) chatBtn.click();
-                // We'll handle the actual summarization in the AIChat component by passing a prop or using a custom event
-                window.dispatchEvent(new CustomEvent('ai-action', { detail: 'summarize-resume' }));
-              }}
-              className="px-8 py-4 glass rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all border border-white/10"
-            >
-              AI Resume Summary <BrainCircuit size={20} className="text-blue-500" />
-            </button>
-          </div>
-
-          {/* Resume Section */}
-          <div className="flex flex-wrap items-center gap-4 mt-8 pt-8 border-t border-white/10">
+            <a href="#live-demo" className="px-8 py-4 glass rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all border border-white/10">
+              Try Live Demo <BrainCircuit size={20} className="text-blue-500" />
+            </a>
             {profile.resumeUrl ? (
-              <>
-                <button 
-                  onClick={handleResumeView}
-                  className="px-6 py-3 glass rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all border border-white/10 text-sm"
-                >
-                  <Eye size={16} /> View Resume
-                </button>
-              </>
+              <button 
+                onClick={handleResumeView}
+                className="px-8 py-4 glass rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all border border-blue-500/30 text-blue-400 hover:text-blue-300"
+              >
+                Download Resume <FileText size={20} />
+              </button>
             ) : (
-              <div className="text-gray-400 text-sm italic flex items-center gap-2">
-                <FileText size={16} /> No resume available
-              </div>
+              <button 
+                disabled
+                className="px-8 py-4 glass rounded-xl font-bold flex items-center gap-2 border border-white/10 text-gray-500 opacity-50 cursor-not-allowed"
+              >
+                Download Resume <FileText size={20} />
+              </button>
             )}
             
             {isAdmin && (
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex items-center gap-2">
                 <button 
                   onClick={() => resumeInputRef.current?.click()}
                   disabled={uploading}
-                  className="px-4 py-2 bg-blue-600/20 text-blue-400 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-600/30 transition-all text-sm border border-blue-500/30"
+                  className="px-4 py-4 bg-blue-600/20 text-blue-400 rounded-xl font-bold flex items-center gap-2 hover:bg-blue-600/30 transition-all border border-blue-500/30"
+                  title="Upload Resume"
                 >
-                  {uploading ? <Loader2 className="animate-spin" size={16} /> : <Upload size={16} />}
-                  Upload Resume
+                  {uploading ? <Loader2 className="animate-spin" size={20} /> : <Upload size={20} />}
                 </button>
                 <input 
                   type="file" 
@@ -659,12 +647,12 @@ const ProjectsSection = () => {
             setRepos([
               {
                 id: 1,
-                name: 'AI-Powered-Portfolio',
-                description: 'A modern, responsive portfolio built with React, Tailwind CSS, and Firebase.',
-                stargazers_count: 42,
-                language: 'TypeScript',
+                name: 'GenAI-Enterprise-Architecture',
+                description: 'Enterprise integration patterns using GenAI, MuleSoft, and Pega on Cloud infrastructure.',
+                stargazers_count: 84,
+                language: 'Python',
                 html_url: 'https://github.com/vinod1rai249-max?tab=repositories',
-                topics: ['react', 'firebase', 'ai', 'portfolio']
+                topics: ['genai', 'mulesoft', 'pega', 'cloud']
               }
             ]);
           }
@@ -678,14 +666,22 @@ const ProjectsSection = () => {
     fetchRepos();
   }, []);
 
-  const filters = ['All', 'Python', 'TypeScript', 'JavaScript', 'AI'];
+  const filters = ['All', 'Python', 'GenAI', 'Agents', 'RAG', 'Healthcare AI'];
   const filteredRepos = filter === 'All' 
     ? repos 
-    : repos.filter(repo => repo.language === filter || repo.topics?.includes(filter.toLowerCase()));
+    : repos.filter(repo => {
+        const searchStr = `${repo.name} ${repo.description || ''} ${repo.language || ''} ${repo.topics?.join(' ') || ''}`.toLowerCase();
+        if (filter === 'Python') return searchStr.includes('python') || searchStr.includes('jupyter');
+        if (filter === 'GenAI') return searchStr.includes('genai') || searchStr.includes('generative') || searchStr.includes('chat') || searchStr.includes('ai');
+        if (filter === 'Agents') return searchStr.includes('agent');
+        if (filter === 'RAG') return searchStr.includes('document') || searchStr.includes('chat') || searchStr.includes('manager');
+        if (filter === 'Healthcare AI') return searchStr.includes('health') || searchStr.includes('medical') || searchStr.includes('adpo');
+        return searchStr.includes(filter.toLowerCase());
+      });
 
   return (
     <section id="projects" className="py-24 max-w-7xl mx-auto px-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-16">
         <div>
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-blue-500">
@@ -696,14 +692,16 @@ const ProjectsSection = () => {
           <p className="text-gray-500">Automatically synced with my GitHub repositories</p>
         </div>
         
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {filters.map(f => (
             <button 
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                filter === f ? "bg-blue-600 text-[#ffffff]" : "glass text-gray-400 hover:text-white"
+                "px-6 py-3 rounded-xl text-sm font-bold transition-all border backdrop-blur-sm",
+                filter === f 
+                  ? "bg-blue-600/30 text-blue-400 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]" 
+                  : "bg-white/5 text-gray-300 border-white/10 hover:bg-white/10 hover:border-white/30 hover:text-white"
               )}
             >
               {f}
@@ -779,12 +777,12 @@ const ProjectsSection = () => {
 
 const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
   const skillsData = [
-    { subject: 'MuleSoft', A: 95, fullMark: 100 },
-    { subject: 'Pega', A: 90, fullMark: 100 },
-    { subject: 'AI/ML', A: 85, fullMark: 100 },
+    { subject: 'GenAI / AI', A: 95, fullMark: 100 },
+    { subject: 'MuleSoft', A: 90, fullMark: 100 },
+    { subject: 'Pega', A: 85, fullMark: 100 },
+    { subject: 'Cloud (AWS/GCP)', A: 85, fullMark: 100 },
+    { subject: 'Mainframe', A: 80, fullMark: 100 },
     { subject: 'Python', A: 85, fullMark: 100 },
-    { subject: 'Cloud', A: 80, fullMark: 100 },
-    { subject: 'React', A: 75, fullMark: 100 },
   ];
 
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -828,7 +826,7 @@ const Dashboard = ({ learning }: { learning: LearningProgress[] }) => {
           </h3>
           <p className="text-xs text-gray-500 mb-4 w-full self-start z-10">Drag to rotate the sphere</p>
           <div className="flex-grow w-full flex items-center justify-center z-10">
-            <SkillSphere skills={['MuleSoft', 'Pega', 'Python', 'React', 'AWS', 'GCP', 'Docker', 'Kubernetes', 'TypeScript', 'Node.js', 'Firebase', 'SQL', 'Git', 'Agile', 'API Design']} />
+            <SkillSphere skills={['GenAI', 'MuleSoft', 'Pega', 'Mainframe', 'AWS', 'GCP', 'Azure', 'Kubernetes', 'Python', 'LangChain', 'LlamaIndex', 'Vertex AI', 'SQL', 'Git', 'API Design']} />
           </div>
         </div>
 
@@ -1443,7 +1441,7 @@ const AIChat = ({ profile, theme }: { profile: UserProfile, theme: 'dark' | 'lig
                   <BrainCircuit size={20} />
                 </div>
                 <div>
-                  <div className="font-bold text-sm">Nexus AI</div>
+                  <div className="font-bold text-sm">Vinod AI</div>
                   <div className="text-[10px] text-green-500 flex items-center gap-1">
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Online
                   </div>
@@ -1575,7 +1573,7 @@ const Contact = () => {
               </div>
             </a>
             <a 
-              href="https://www.linkedin.com/in/vinod-rai-23b706392/" 
+              href="https://www.linkedin.com/feed/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-4 group cursor-pointer"
@@ -1728,6 +1726,176 @@ const ReactionsWidget = () => {
 };
 
 
+const LiveDemoSection = () => {
+  return (
+    <section id="live-demo" className="py-24 max-w-7xl mx-auto px-6">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-blue-500">
+          <BrainCircuit size={24} />
+        </div>
+        <div>
+          <h2 className="text-3xl font-display font-bold">Interactive QA Bot</h2>
+          <p className="text-gray-500">Ask questions about my experience directly via this RAG chatbot.</p>
+        </div>
+      </div>
+      
+      <div className="w-full glass rounded-3xl overflow-hidden shadow-2xl relative border border-white/10">
+        <div className="absolute top-0 left-0 right-0 h-10 bg-[#0a0f1c]/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 gap-2 z-10">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+          </div>
+          <div className="ml-4 text-xs font-mono text-gray-500 flex items-center gap-2">
+            <Terminal size={12} /> document-chat-bot-vinod.streamlit.app
+          </div>
+        </div>
+        
+        <div className="w-full flex flex-col items-center justify-center py-24 px-6 bg-[#0E1117] relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+          
+          <div className="w-20 h-20 rounded-full glass flex items-center justify-center text-blue-400 mb-6 relative group overflow-hidden">
+             <div className="absolute inset-0 bg-blue-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+             <BrainCircuit size={32} className="relative z-10 w-8 h-8 group-hover:scale-110 transition-transform" />
+          </div>
+          
+          <h3 className="text-2xl font-bold text-white mb-3">Live Demo Paused</h3>
+          <p className="text-gray-400 text-center max-w-md mb-8">
+            The Streamlit cloud app has gone to sleep due to inactivity. Click below to wake it up and chat with the AI assistant in a new tab.
+          </p>
+          
+          <a
+            href="https://document-chat-bot-vinod.streamlit.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)]"
+          >
+            Launch Interactive QA Bot
+            <ExternalLink size={18} />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const ArchitectureSection = () => {
+  useEffect(() => {
+    mermaid.initialize({ 
+      startOnLoad: false, 
+      theme: 'dark',
+      fontFamily: 'arial, sans-serif',
+      fontSize: 14,
+      flowchart: {
+        htmlLabels: false
+      }
+    });
+    mermaid.run({ querySelector: '.mermaid' }).catch(console.error);
+  }, []);
+
+  return (
+    <section id="architecture" className="py-24 max-w-7xl mx-auto px-6">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-12 h-12 glass rounded-xl flex items-center justify-center text-purple-500">
+          <Network size={24} />
+        </div>
+        <div>
+          <h2 className="text-3xl font-display font-bold">System Architectures</h2>
+          <p className="text-gray-500">Visualizing data-flow pipelines and intelligent agent architectures</p>
+        </div>
+      </div>
+      
+      <div className="space-y-12">
+        {/* ADPO Architecture */}
+        <div>
+          <h3 className="text-xl font-bold mb-6 text-white ml-2 border-l-4 border-purple-500 pl-4">ADPO System Architecture</h3>
+          <div className="glass-card p-4 md:p-8 overflow-x-auto relative rounded-3xl border border-white/10 shadow-2xl bg-[#0a0f1c]/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+            <div className="w-full flex justify-center py-8">
+              <div className="mermaid w-full text-center [&>svg]:w-full [&>svg]:max-w-4xl [&>svg]:h-auto [&>svg]:mx-auto">
+                {`
+                  graph LR
+                    classDef source fill:#1e1e2f,stroke:#4b4b6b,stroke-width:2px,color:#fff
+                    classDef pubsub fill:#2a2a40,stroke:#6b4b8b,stroke-width:2px,color:#fff
+                    classDef api fill:#1e3a5f,stroke:#4b8b8b,stroke-width:2px,color:#fff
+                    classDef model fill:#4b1e4b,stroke:#8b4b8b,stroke-width:2px,color:#fff
+                    classDef db fill:#4b3a1e,stroke:#8b8b4b,stroke-width:2px,color:#fff
+                    classDef ui fill:#1e4b3a,stroke:#4b8b6b,stroke-width:2px,color:#fff
+
+                    LIS["LIS System"]:::source -->|"HL7 Messages"| PS["Pub/Sub"]:::pubsub
+                    PS -->|"Triggers"| FA["FastAPI"]:::api
+                    FA --> RE["Rule Engine"]:::api
+                    RE -->|"Transforms Data"| VAI["Vertex AI\nGenAI Predictions"]:::model
+                    VAI -->|"Rich Annotations"| FS[("(Firestore)")]:::db
+                    FS -->|"Real-time streams"| UI["Streamlit UI"]:::ui
+                `}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Incident Debugging Agent Architecture */}
+        <div>
+          <h3 className="text-xl font-bold mb-6 text-white ml-2 border-l-4 border-blue-500 pl-4">AI Incident Debugging Agent</h3>
+          <div className="glass-card p-4 md:p-8 overflow-x-auto relative rounded-3xl border border-white/10 shadow-2xl bg-[#0a0f1c]/50">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+            <div className="w-full flex justify-center py-8">
+              <div className="mermaid w-full text-center [&>svg]:w-full [&>svg]:max-w-4xl [&>svg]:h-auto [&>svg]:mx-auto">
+                {`
+                  graph TD
+                    classDef client fill:#1e40af,stroke:#60a5fa,stroke-width:2px,color:#fff,rx:10,ry:10
+                    classDef api fill:#0f766e,stroke:#5eead4,stroke-width:2px,color:#fff,rx:5,ry:5
+                    classDef process fill:#374151,stroke:#9ca3af,stroke-width:2px,color:#fff,rx:5,ry:5
+                    classDef decision fill:#b45309,stroke:#fbbf24,stroke-width:2px,color:#fff,rx:15,ry:15
+                    classDef agent fill:#6b21a8,stroke:#d8b4fe,stroke-width:2px,color:#fff,rx:10,ry:10
+                    classDef output fill:#166534,stroke:#86efac,stroke-width:2px,color:#fff,rx:10,ry:10
+
+                    User(["👤 User / Streamlit UI"]):::client
+                    API["FastAPI Endpoint"]:::api
+                    Cache["Cache Check"]:::process
+                    Compact["Log Compactor"]:::process
+                    Routing{{"Is Complex Issue?"}}:::decision
+
+                    User -->|"Submits Logs/Errors"| API
+                    API --> Cache
+                    Cache -->|"Cache Miss"| Compact
+                    Compact -->|"Parses Data"| Routing
+
+                    subgraph AI_Pipeline ["🧠 AI Agent Pipeline"]
+                        style AI_Pipeline fill:#0a0f1c,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5,color:#fff,rx:10
+
+                        Planner["Planner Agent\nEvaluates Complexity"]:::agent
+                        Classifier["Classifier Agent\nCategorizes Error"]:::agent
+                        RAG[("RAG Retriever\nSearches Past Incidents")]:::process
+                        RootCause["Root Cause Agent\nDiagnoses Issue"]:::agent
+                        Fixer["Fix Agent\nSuggests Solutions"]:::agent
+                        Critic["Critic Agent\nReviews & Scores"]:::agent
+
+                        Planner -.->|"Complex Only"| Classifier
+                        Classifier --> RAG
+                        RAG --> RootCause
+                        RootCause --> Fixer
+                        Fixer -.->|"Complex Only"| Critic
+                    end
+
+                    Routing -->|"Yes"| Planner
+                    Routing -->|"No"| Classifier
+                    Fixer -->|"Simple Issue"| Report["📄 Incident Report"]:::output
+                    Critic --> Report
+
+                    Report -->|"Displays Fix & RCA"| User
+                    Report -.->|"Logs Data"| Metrics[("(Prometheus Metrics)")]:::process
+                `}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
 export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -1784,7 +1952,7 @@ export default function App() {
           profileImage: "https://picsum.photos/seed/vinod1rai249-max/600/600",
           socialLinks: {
             github: "https://github.com/vinod1rai249-max",
-            linkedin: "https://www.linkedin.com/in/vinod-rai-23b706392/",
+            linkedin: "https://www.linkedin.com/feed/",
             twitter: "https://twitter.com/vinod1rai249-max"
           }
         };
@@ -2037,6 +2205,8 @@ export default function App() {
         handleResumeUpload={handleResumeUpload}
         handleResumeView={handleResumeView}
       />
+      <LiveDemoSection />
+      <ArchitectureSection />
       <ExperienceSection experiences={experiences} />
       <ProjectsSection />
       <AchievementsSection achievements={achievements} isAdmin={isAdmin} />
@@ -2045,7 +2215,7 @@ export default function App() {
       
       <footer className="py-12 border-t border-white/10 text-center text-gray-500 text-sm">
         <div className="max-w-7xl mx-auto px-6">
-          <p>© {new Date().getFullYear()} Nexus Portfolio. Built with React, Firebase & Gemini AI.</p>
+          <p>© {new Date().getFullYear()} Vinod's Portfolio. Built with Tailwind, Firebase & Gemini AI.</p>
         </div>
       </footer>
 

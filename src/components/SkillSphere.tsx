@@ -8,7 +8,7 @@ const Word = ({ children, position }: { children: string, position: THREE.Vector
   const color = new THREE.Color();
   const fontProps = {
     font: 'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff',
-    fontSize: 2.5,
+    fontSize: 2.2,
     letterSpacing: -0.05,
     lineHeight: 1,
     'material-toneMapped': false
@@ -75,11 +75,11 @@ export const SkillSphere = ({ skills }: { skills: string[] }) => {
   }, [skills]);
 
   return (
-    <div className="w-full h-[400px] cursor-grab active:cursor-grabbing">
-      <Canvas camera={{ position: [0, 0, 35], fov: 90 }}>
-        <fog attach="fog" args={['#000', 0, 40]} />
+    <div className="w-full h-[500px] cursor-grab active:cursor-grabbing">
+      <Canvas camera={{ position: [0, 0, 36], fov: 90 }}>
+        <fog attach="fog" args={['#000', 0, 45]} />
         <ambientLight intensity={0.5} />
-        <Cloud count={5} radius={20} words={displayWords} />
+        <Cloud count={5} radius={18} words={displayWords} />
         <TrackballControls noZoom={true} noPan={true} rotateSpeed={2.0} />
       </Canvas>
     </div>
